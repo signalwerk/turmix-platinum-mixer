@@ -1,0 +1,26 @@
+{
+  "name": "turmix-platinum-mixer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "model.js",
+  "scripts": {
+    "generate": "jscad model.jscad -o output.stl",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/signalwerk/turmix-platinum-mixer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/signalwerk/turmix-platinum-mixer/issues"
+  },
+  "homepage": "https://github.com/signalwerk/turmix-platinum-mixer#readme",
+  "dependencies": {
+    "@jscad/cli": "^2.2.24",
+    "@jscad/modeling": "^2.10.0",
+    "@jscad/stl-serializer": "^2.1.12"
+  }
+}
