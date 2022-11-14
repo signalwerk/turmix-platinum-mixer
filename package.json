@@ -20,7 +20,6 @@
   "homepage": "https://github.com/signalwerk/turmix-platinum-mixer#readme",
   "dependencies": {
     "@jscad/cli": "^2.2.24",
-    "@jscad/modeling": "^2.10.0",
-    "@jscad/stl-serializer": "^2.1.12"
+    "@jscad/modeling": "^2.10.0"
   }
 }

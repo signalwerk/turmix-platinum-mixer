@@ -1,9 +1,3 @@
-// const fs = require("fs");
-// const stlSerializer = require("@jscad/stl-serializer");
-
-// https://openjscad.xyz/dokuwiki/doku.php?id=en:design_guide_rotate
-
-// https://github.com/jscad/OpenJSCAD.org/discussions/883
 const jscad = require("@jscad/modeling");
 const {
   connectors,
@@ -50,34 +44,13 @@ const { degToRad } = utils;
 
 const { colorize, hexToRgb } = colors;
 
-// function degToRad(degrees) {
-//   return degrees * (Math.PI / 180);
-// }
-
 const TRANSPARENT_RED = [1, 0.5, 0.3, 0.6];
 const TRANSPARENT_BLUE = [0, 0, 1, 0.6];
 const TRANSPARENT_GREEN = [0, 1, 1, 0.7];
 
-// A function declaration that returns geometry
-// const main = () => {
-//   return cube()
-// }
-
-// const {
-//   primitives: { cuboid },
-// } = require("@jscad/modeling");
-// const { intersect, subtract, union } = require("@jscad/modeling").booleans;
-// const { cube, cuboid } = require("@jscad/modeling").primitives;
-
-// const {cylinder} = require('@jscad/csg/api').primitives3d
-// const {color} = require('@jscad/csg/api').color
-// const {difference} = require('@jscad/csg/api').booleanOps
-// const {translate} = require('@jscad/csg/api').transformations
-// jscad
-
 const options = {
   inner: {
-    height: 27,
+    height: 16,
     radius: 19.5 / 2,
   },
   thread: {
@@ -97,9 +70,13 @@ const options = {
   },
   foot: {
     length: 28,
-    width: 14,
+    width: 13,
     heightStart: 5,
-    heightEnd: 8,
+    heightEnd: 9,
+  },
+  footCrop: {
+    radius: 42,
+    height: 1.5,
   },
   resolution: 120,
   overlap: 0.5,
@@ -141,9 +118,6 @@ function wedge(params) {
 }
 
 function main() {
-  // return [sphere()];
-  // return [cuboid(), cuboid().translate([0, 5, 5])];
-
   const top = colorize(
     TRANSPARENT_GREEN,
     cylinder({
@@ -166,19 +140,6 @@ function main() {
       segments: options.resolution,
     })
   );
-
-  // const foot = colorize(
-  //   TRANSPARENT_BLUE,
-  //   cuboid({
-  //     size: [options.foot.length, options.foot.width, options.foot.heightStart],
-  //     center: [
-  //       options.foot.length / 2 + options.bottom.radius,
-  //       0,
-  //       options.foot.heightStart / 2,
-  //     ],
-  //   })
-  // );
-  //
 
   const baseWedgeFooter = (() => {
     const overflowFactor = 1.2;
@@ -218,19 +179,6 @@ function main() {
       rotate([0, 0, degToRad(270)], movedBaseWedgeFooter),
     ]
   );
-  // const wedgeFooter2 = colorize(
-  //   TRANSPARENT_BLUE,
-
-  //   // move to outer radius
-  //   rotate([0, 0, degToRad(90)], movedBaseWedgeFooter)
-  // );
-
-  // thread: {
-  //   top:4,
-  //   width: 8.5,
-  //   height: 4, // smaller end 3.5
-  //   radius: 32.5 / 2,
-  // },
 
   const baseWedgeThread = (() => {
     return wedge({
@@ -264,10 +212,10 @@ function main() {
 
     // move to outer radius
     union(
-      movedBaseWedgeThread,
-      rotate([0, 0, degToRad(90)], movedBaseWedgeThread),
-      rotate([0, 0, degToRad(180)], movedBaseWedgeThread),
-      rotate([0, 0, degToRad(270)], movedBaseWedgeThread)
+      rotate([0, 0, degToRad(45)], movedBaseWedgeThread),
+      rotate([0, 0, degToRad(135)], movedBaseWedgeThread),
+      rotate([0, 0, degToRad(225)], movedBaseWedgeThread),
+      rotate([0, 0, degToRad(315)], movedBaseWedgeThread)
     )
   );
 
@@ -303,12 +251,27 @@ function main() {
       segments: options.resolution,
     })
   );
-  // return [foot, wedgeFooter];
-  // return [wedgeFooter, thread, inner, top, bottom];
 
-  return subtract(union(wedgeFooter, thread, inner, top, bottom), inner);
+  // subtract to have concave foot
+  const down = rotate(
+    [0, 0, degToRad(45)],
+    translate(
+      [0, 0, options.footCrop.height / 2],
+      cylinderElliptic({
+        height: options.footCrop.height,
+        startRadius: [options.footCrop.radius, options.footCrop.radius],
+        endRadius: [options.bottom.radius, options.bottom.radius],
+        segments: options.resolution,
+      })
+    )
+  );
 
-  // return [c];
+  const footer = subtract(
+    union(wedgeFooter, thread, inner, top, bottom),
+    inner
+  );
+
+  return [subtract(footer, down)];
 }
 
 console.log({
